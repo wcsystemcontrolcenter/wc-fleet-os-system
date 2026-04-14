@@ -417,9 +417,9 @@ tfoot td.tfu{background:#DDD9F5;color:#2A1C78;font-weight:700;border-left:1px so
     <div class="sb-sec">
       <div class="sb-lbl">Period</div>
       <select class="fsel" id="sb-period" onchange="onPeriodChange()">
-        <option value="2025-04-01|2025-04-15">1–15 เม.ย. 2568</option>
-        <option value="2025-04-16|2025-04-30">16–30 เม.ย. 2568</option>
-        <option value="2025-03-01|2025-03-15">1–15 มี.ค. 2568</option>
+        <option value="2026-04-01|2026-04-15">1–15 เม.ย. 2569</option>
+        <option value="2026-04-16|2026-04-30">16–30 เม.ย. 2569</option>
+        <option value="2026-03-01|2026-03-15">1–15 มี.ค. 2569</option>
       </select>
     </div>
     <!-- Filters -->
@@ -485,11 +485,11 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycbzE7gGFwi7nVi7ukhFXFfGV_I
    STATE
 ═══════════════════════════════════════════════════════ */
 var S = {
-  main    : 'people',   // 'people' | 'vehicle'
-  sub     : 'daily',    // 'daily'  | 'hourly'
-  n       : 15,         // 15 | 7 | 30
-  dateFrom: '2025-04-01',
-  dateTo  : '2025-04-15',
+  main    : 'people',
+  sub     : 'daily',
+  n       : 15,
+  dateFrom: '2026-04-01',
+  dateTo  : '2026-04-15',
   cache   : {},         // key → {data, ts}
   CACHE_MS: 5 * 60 * 1000,
 };
