@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WC Fleet OS — HR Leave Management</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#016F30; --brand-dk:#014D22;
+  --bg:#F5F4F0; --sf:#FFF; --s2:#EEEDE8; --s3:#E6E4DE;
+  --bd:#DDDBD3; --bd2:#C9C7BE;
+  --t1:#1A1916; --t2:#6A6860; --t3:#A8A69D;
+  --g50:#D4F0E3; --g4:#2BAF74; --g7:#0A5C37;
+  --r50:#FCDEDE; --r4:#DC4F4F; --r7:#6B1616;
+  --b50:#DAE9FC; --b4:#3D7ED6; --b7:#163D72;
+  --a50:#FEF0CD; --a4:#CC920C; --a7:#5A3903;
+  --pk50:#FADBEE; --pk4:#CC4F86; --pk7:#601232;
+  --cr50:#FCEAE2; --cr4:#D16040; --cr7:#652210;
+  --pu50:#ECEAFD; --pu4:#6454D0; --pu7:#2A1C78;
+  --gy50:#EEECEA; --gy4:#888680; --gy7:#3C3B38;
+  --font:'IBM Plex Sans Thai',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:12px;display:flex;flex-direction:column}
+
+/* ── Nav ── */
+.nav{height:44px;background:var(--brand);display:flex;align-items:stretch;flex-shrink:0;z-index:60}
+.nav-logo{
+  display:flex;align-items:center;padding:0 16px;
+  font-size:13px;font-weight:600;color:#fff;letter-spacing:-.3px;gap:8px;
+}
+.nav-logo-text{line-height:1.2}
+.nav-logo-text small{display:block;font-size:9px;font-weight:400;opacity:.7}
+.nav-sp{flex:1}
+.back-btn{
+  margin:10px 14px;padding:0 12px;
+  background:rgba(255,255,255,.12);color:#fff;
+  border:1px solid rgba(255,255,255,.25);border-radius:5px;
+  font-size:10px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:5px;font-family:var(--font);
+  text-decoration:none;transition:background .12s;
+}
+.back-btn:hover{background:rgba(255,255,255,.22)}
+.hr-badge{
+  margin:12px 14px 12px 0;padding:2px 10px;
+  background:rgba(255,255,255,.15);color:#fff;
+  border:1px solid rgba(255,255,255,.25);border-radius:4px;
+  font-size:10px;font-weight:600;display:flex;align-items:center;
+}
+
+/* ── Layout ── */
+.app{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ── */
+.sb{
+  width:220px;flex-shrink:0;background:var(--sf);
+  border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.sb-sec{padding:12px 14px;border-bottom:1px solid var(--bd)}
+.sb-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.sb-stat{display:flex;flex-direction:column;gap:6px}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--s2);border-radius:6px}
+.stat-row-label{font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px}
+.stat-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.stat-count{font-size:12px;font-weight:600;color:var(--t1)}
+.sb-note{font-size:9px;color:var(--t3);line-height:1.7;padding:10px 14px;border-bottom:1px solid var(--bd)}
+.sb-note b{color:var(--r7)}
+
+/* ── Content ── */
+.content{flex:1;overflow-y:auto;padding:20px 24px 40px}
+
+/* ── Period bar ── */
+.pbar{
+  background:var(--sf);border-bottom:1px solid var(--bd);
+  padding:0 24px;height:48px;display:flex;align-items:center;
+  gap:12px;flex-shrink:0;
+}
+.ptitle{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.3px}
+.psub{font-size:10px;color:var(--t2)}
+.psp{flex:1}
+.pb{width:28px;height:28px;border:1px solid var(--bd);border-radius:6px;background:var(--sf);color:var(--t2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.pb:hover{background:var(--s2)}
+.period-stats{display:flex;gap:8px}
+.pstat{background:var(--s2);border-radius:6px;padding:4px 10px;font-size:10px;color:var(--t2);text-align:center;cursor:default}
+.pstat b{display:block;font-size:14px;font-weight:600;color:var(--t1);line-height:1.2}
+
+/* ── Main grid ── */
+.grid2{display:grid;grid-template-columns:420px 1fr;gap:20px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+
+/* ── Card ── */
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:20px}
+.card-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-badge{font-size:9px;padding:2px 7px;border-radius:3px;font-weight:600;background:var(--b50);color:var(--b7)}
+
+/* ── Form ── */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg.span2{grid-column:span 2}
+.frow{display:flex;flex-direction:column;gap:4px}
+.frow.full{grid-column:span 2}
+.flbl{font-size:11px;font-weight:500;color:var(--t2)}
+.flbl .req{color:var(--r4);margin-left:2px}
+.finp,.fsel2{
+  padding:8px 10px;border:1px solid var(--bd);border-radius:7px;
+  font-size:12px;background:var(--sf);color:var(--t1);
+  font-family:var(--font);outline:none;transition:border-color .15s;width:100%;
+}
+.finp:focus,.fsel2:focus{border-color:var(--pu4)}
+.finp:disabled{background:var(--s2);color:var(--t3);cursor:not-allowed}
+.fsel2 optgroup{font-weight:600;color:var(--t2)}
+
+/* Leave type grid */
+.lt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.lto{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  border:1.5px solid var(--bd);border-radius:7px;
+  cursor:pointer;transition:all .12s;user-select:none;
+}
+.lto:hover{border-color:var(--pu4);background:var(--pu50)}
+.lto.sel{border-color:var(--pu4);background:var(--pu50)}
+.lt-dot{width:11px;height:11px;border-radius:2px;flex-shrink:0}
+.lt-bl{background:#85B7EB}.lt-sl{background:#FAC775}
+.lt-el{background:#ED93B1}.lt-al{background:#F0997B}.lt-off{background:#D0CECC}
+.lt-name{font-size:11px;font-weight:500;color:var(--t1);line-height:1.2}
+.lt-en{font-size:9px;color:var(--t2)}
+
+/* Full/Half toggle */
+.fh-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.fhb{
+  padding:8px;border:1.5px solid var(--bd);border-radius:7px;
+  font-size:11px;font-weight:500;cursor:pointer;
+  background:transparent;color:var(--t2);
+  font-family:var(--font);text-align:center;transition:all .12s;
+}
+.fhb.active{background:var(--pu50);color:var(--pu7);border-color:var(--pu4)}
+#time-fields{display:none}
+#time-fields.show{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* Conflict alert */
+.conflict-alert{
+  display:none;background:var(--a50);border:1px solid #F0C040;
+  border-radius:7px;padding:9px 12px;font-size:11px;color:var(--a7);
+  line-height:1.6;margin-top:8px;align-items:flex-start;gap:8px;
+}
+.conflict-alert.show{display:flex}
+
+/* Loading in select */
+.fsel2:disabled{cursor:wait}
+
+/* Submit */
+.submit-row{display:flex;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)}
+.btn-save{
+  flex:1;padding:10px;background:var(--brand);color:#fff;
+  border:none;border-radius:7px;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:var(--font);transition:background .12s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-save:hover{background:var(--brand-dk)}
+.btn-save:disabled{background:var(--gy4);cursor:not-allowed}
+.btn-clear{
+  padding:10px 16px;border:1px solid var(--bd);border-radius:7px;
+  font-size:12px;background:transparent;color:var(--t2);
+  cursor:pointer;font-family:var(--font);
+}
+.btn-clear:hover{background:var(--s2)}
+
+/* Success toast */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--g7);color:#fff;border-radius:8px;
+  padding:12px 18px;font-size:12px;font-weight:500;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 4px 20px rgba(0,0,0,.15);
+  transform:translateY(80px);opacity:0;
+  transition:all .3s;pointer-events:none;z-index:999;
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* Info box */
+.info-box{
+  background:var(--b50);border:1px solid #B5D4F4;
+  border-radius:7px;padding:10px 14px;
+  font-size:11px;color:var(--b7);line-height:1.7;margin-top:16px;
+}
+
+/* ── Leave list ── */
+.list-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.list-title{font-size:13px;font-weight:600;color:var(--t1);flex:1}
+.search-inp{
+  padding:6px 10px;border:1px solid var(--bd);border-radius:6px;
+  font-size:11px;background:var(--sf);color:var(--t1);
+  font-family:var(--font);outline:none;width:160px;
+}
+.search-inp:focus{border-color:var(--pu4)}
+.fsel-month{
+  padding:6px 10px;border:1px solid var(--bd);border-radius:6px;
+  font-size:11px;background:var(--sf);color:var(--t1);
+  cursor:pointer;font-family:var(--font);outline:none;
+}
+
+table.lt{width:100%;border-collapse:collapse;font-size:11px}
+table.lt thead th{
+  background:var(--s2);padding:7px 10px;text-align:left;
+  font-weight:500;font-size:10px;color:var(--t2);
+  border-bottom:1px solid var(--bd);white-space:nowrap;
+}
+table.lt tbody td{padding:8px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
+table.lt tbody tr:last-child td{border-bottom:none}
+table.lt tbody tr:hover td{background:#FAFAF7}
+
+.ltb{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:600}
+.lb-BL{background:var(--b50);color:var(--b7)}
+.lb-SL{background:var(--a50);color:var(--a7)}
+.lb-EL{background:var(--pk50);color:var(--pk7)}
+.lb-AL{background:var(--cr50);color:var(--cr7)}
+.lb-OFF{background:var(--gy50);color:var(--gy7)}
+.half-tag{font-size:8px;background:#FFF0CD;color:var(--a7);padding:1px 5px;border-radius:3px;font-weight:600;margin-left:3px}
+
+.btn-del{
+  background:none;border:none;color:var(--t3);
+  cursor:pointer;font-size:11px;padding:3px 8px;
+  border-radius:4px;font-family:var(--font);
+}
+.btn-del:hover{background:var(--r50);color:var(--r4)}
+
+.list-footer{padding:10px 0 0;font-size:10px;color:var(--t3);text-align:center}
+.spinner-sm{
+  width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .6s linear infinite;display:inline-block;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:32px;color:var(--t3);font-size:11px}
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<div class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <rect x="1" y="6" width="22" height="13" rx="2.5" stroke="white" stroke-width="1.6"/>
+      <path d="M4 6V4.5A1.5 1.5 0 015.5 3h13A1.5 1.5 0 0120 4.5V6" stroke="white" stroke-width="1.6"/>
+      <circle cx="6.5" cy="19" r="2.5" fill="white"/>
+      <circle cx="17.5" cy="19" r="2.5" fill="white"/>
+      <path d="M9 19h6" stroke="white" stroke-width="1.6"/>
+    </svg>
+    <div class="nav-logo-text">
+      WC Fleet <b>OS</b>
+      <small>Fleet Management System</small>
+    </div>
+  </div>
+  <div class="nav-sp"></div>
+  <div class="hr-badge">HR Management</div>
+  <a class="back-btn" href="index.html">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    กลับ Dashboard
+  </a>
+</div>
+
+<!-- ── App ── -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sb">
+    <div class="sb-sec">
+      <div class="sb-lbl">เดือน / งวด</div>
+      <select class="fsel2" id="sb-month" onchange="onMonthChange()">
+        <option value="2025-04">เมษายน 2568</option>
+        <option value="2025-03">มีนาคม 2568</option>
+        <option value="2025-02">กุมภาพันธ์ 2568</option>
+      </select>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">สรุปเดือนนี้</div>
+      <div class="sb-stat" id="sb-stat">
+        <div class="stat-row"><span class="stat-row-label"><div class="stat-dot" style="background:#85B7EB"></div>BL ลากิจ</span><span class="stat-count" id="cnt-BL">—</span></div>
+        <div class="stat-row"><span class="stat-row-label"><div class="stat-dot" style="background:#FAC775"></div>SL ลาป่วย</span><span class="stat-count" id="cnt-SL">—</span></div>
+        <div class="stat-row"><span class="stat-row-label"><div class="stat-dot" style="background:#ED93B1"></div>EL ลากะทันหัน</span><span class="stat-count" id="cnt-EL">—</span></div>
+        <div class="stat-row"><span class="stat-row-label"><div class="stat-dot" style="background:#F0997B"></div>AL ลาอุบัติเหตุ</span><span class="stat-count" id="cnt-AL">—</span></div>
+        <div class="stat-row"><span class="stat-row-label"><div class="stat-dot" style="background:#D0CECC"></div>OFF หยุดงาน</span><span class="stat-count" id="cnt-OFF">—</span></div>
+      </div>
+    </div>
+
+    <div class="sb-note">
+      <b>P (จอดรถ)</b> คำนวณอัตโนมัติ ไม่ต้องกรอกครับ<br>
+      ระบบจะขึ้น P เองเมื่อไม่มี job และไม่มี leave ในวันนั้น
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div style="flex:1;overflow-y:auto">
+    <!-- Period bar -->
+    <div class="pbar">
+      <div style="display:flex;align-items:center;gap:4px">
+        <button class="pb" onclick="shiftMonth(-1)">&#8249;</button>
+        <button class="pb" onclick="shiftMonth(1)">&#8250;</button>
+      </div>
+      <div>
+        <div class="ptitle" id="pbar-title">เมษายน 2568</div>
+        <div class="psub">HR Leave Management · Own Fleet</div>
+      </div>
+      <div class="psp"></div>
+      <div class="period-stats">
+        <div class="pstat"><b id="stat-total">—</b>รายการ</div>
+        <div class="pstat"><b id="stat-drivers">—</b>คน</div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div style="padding:20px 24px 40px">
+      <div class="grid2">
+
+        <!-- ── Form ── -->
+        <div class="card">
+          <div class="card-title">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.5" stroke="var(--brand)" stroke-width="1.4"/><path d="M2 14c0-3 2.5-4.5 6-4.5s6 1.5 6 4.5" stroke="var(--brand)" stroke-width="1.4" stroke-linecap="round"/><path d="M12 3v4M10 5h4" stroke="var(--brand)" stroke-width="1.4" stroke-linecap="round"/></svg>
+            เพิ่มสถานะ
+            <span class="card-badge">Manual</span>
+          </div>
+
+          <div class="fg">
+
+            <!-- เลือกพนักงาน -->
+            <div class="frow full">
+              <label class="flbl">คนขับ / Vanboy <span class="req">*</span></label>
+              <select class="fsel2" id="f-driver" onchange="onDriverChange()">
+                <option value="">— กำลังโหลดรายชื่อ... —</option>
+              </select>
+            </div>
+
+            <!-- วันเริ่ม -->
+            <div class="frow">
+              <label class="flbl">วันเริ่ม <span class="req">*</span></label>
+              <input type="date" class="finp" id="f-ds" onchange="checkConflict()">
+            </div>
+
+            <!-- วันสิ้นสุด -->
+            <div class="frow">
+              <label class="flbl">วันสิ้นสุด <span class="req">*</span></label>
+              <input type="date" class="finp" id="f-de" onchange="checkConflict()">
+            </div>
+
+            <!-- ประเภทการลา -->
+            <div class="frow full">
+              <label class="flbl">ประเภทสถานะ <span class="req">*</span></label>
+              <div class="lt-grid">
+                <label class="lto sel" onclick="selType(this,'BL')">
+                  <div class="lt-dot lt-bl"></div>
+                  <div><div class="lt-name">BL — ลากิจ</div><div class="lt-en">Business Leave</div></div>
+                </label>
+                <label class="lto" onclick="selType(this,'SL')">
+                  <div class="lt-dot lt-sl"></div>
+                  <div><div class="lt-name">SL — ลาป่วย</div><div class="lt-en">Sick Leave</div></div>
+                </label>
+                <label class="lto" onclick="selType(this,'EL')">
+                  <div class="lt-dot lt-el"></div>
+                  <div><div class="lt-name">EL — ลากะทันหัน</div><div class="lt-en">Emergency Leave</div></div>
+                </label>
+                <label class="lto" onclick="selType(this,'AL')">
+                  <div class="lt-dot lt-al"></div>
+                  <div><div class="lt-name">AL — ลาอุบัติเหตุ</div><div class="lt-en">Accident Leave</div></div>
+                </label>
+                <label class="lto" onclick="selType(this,'OFF')">
+                  <div class="lt-dot lt-off"></div>
+                  <div><div class="lt-name">OFF — หยุดงาน</div><div class="lt-en">Day Off</div></div>
+                </label>
+              </div>
+            </div>
+
+            <!-- เต็มวัน / ครึ่งวัน -->
+            <div class="frow full">
+              <label class="flbl">ระยะเวลา</label>
+              <div class="fh-wrap">
+                <button class="fhb active" onclick="setDuration('full',this)">เต็มวัน</button>
+                <button class="fhb" onclick="setDuration('half',this)">ครึ่งวัน / ระบุเวลา</button>
+              </div>
+              <div id="time-fields">
+                <div class="frow">
+                  <label class="flbl" style="font-size:10px">เวลาเริ่ม</label>
+                  <input type="time" class="finp" id="f-ts" value="08:00">
+                </div>
+                <div class="frow">
+                  <label class="flbl" style="font-size:10px">เวลาสิ้นสุด</label>
+                  <input type="time" class="finp" id="f-te" value="12:00">
+                </div>
+              </div>
+            </div>
+
+            <!-- หมายเหตุ -->
+            <div class="frow full">
+              <label class="flbl">หมายเหตุ</label>
+              <input type="text" class="finp" id="f-note"
+                placeholder="เช่น ใบรับรองแพทย์ / แจ้งล่วงหน้า / เหตุฉุกเฉิน">
+            </div>
+
+          </div><!-- end fg -->
+
+          <!-- Conflict alert -->
+          <div class="conflict-alert" id="conflict-alert">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M8 2L14 13H2L8 2Z" stroke="var(--a7)" stroke-width="1.3"/><path d="M8 6v3M8 10.5h.01" stroke="var(--a7)" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div>
+              <b>พบ job ในช่วงวันที่เลือก</b><br>
+              คนขับคนนี้มี job อยู่แล้ว — กรุณาตรวจสอบกับ Supervisor ก่อน save
+            </div>
+          </div>
+
+          <div class="submit-row">
+            <button class="btn-clear" onclick="clearForm()">ล้างฟอร์ม</button>
+            <button class="btn-save" id="btn-save" onclick="saveLeave()">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 7-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              บันทึก → Supabase
+            </button>
+          </div>
+
+          <div class="info-box">
+            ข้อมูลจะ sync กับ Dashboard อัตโนมัติ<br>
+            ลาครึ่งวัน → Hourly view แสดง block ตามเวลาที่ระบุ ไม่ใช่เต็มวัน
+          </div>
+        </div>
+
+        <!-- ── Leave list ── -->
+        <div class="card">
+          <div class="list-header">
+            <div class="list-title">รายการสถานะ</div>
+            <input type="text" class="search-inp" id="search-inp"
+              placeholder="ค้นหาชื่อ..." oninput="filterList(this.value)">
+            <select class="fsel-month" id="filter-type" onchange="renderList()">
+              <option value="all">ประเภท: ทั้งหมด</option>
+              <option value="BL">BL</option>
+              <option value="SL">SL</option>
+              <option value="EL">EL</option>
+              <option value="AL">AL</option>
+              <option value="OFF">OFF</option>
+            </select>
+          </div>
+
+          <div id="list-wrap">
+            <div class="empty-state">กำลังโหลดรายการ...</div>
+          </div>
+          <div class="list-footer" id="list-footer"></div>
+        </div>
+
+      </div><!-- end grid2 -->
+    </div>
+  </div><!-- end content -->
+</div><!-- end app -->
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 7-7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   CONFIG — แก้ GAS_URL หลัง deploy GAS
+═══════════════════════════════════════════════════════ */
+var GAS_URL = 'YOUR_GAS_WEB_APP_URL_HERE';
+
+/* ═══════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════ */
+var leaveType = 'BL';
+var isFullDay = true;
+var currentMonth = '2025-04';
+var leaveList = [];    // loaded from GAS
+var drivers   = [];    // loaded from GAS
+
+/* ═══════════════════════════════════════════════════════
+   GAS FETCH
+═══════════════════════════════════════════════════════ */
+async function gasGet(params) {
+  var qs = Object.entries(params).map(function(e){
+    return encodeURIComponent(e[0]) + '=' + encodeURIComponent(e[1]);
+  }).join('&');
+  var res = await fetch(GAS_URL + '?' + qs);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+async function gasPost(payload) {
+  var res = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOAD DRIVERS (tb_master_drivers WHERE fleet_group='Own')
+═══════════════════════════════════════════════════════ */
+async function loadDrivers() {
+  var sel = document.getElementById('f-driver');
+  sel.innerHTML = '<option value="">— กำลังโหลด... —</option>';
+  sel.disabled = true;
+
+  try {
+    var data = await gasGet({ fn: 'getDriverList', fleetGroup: 'Own' });
+    drivers = data.drivers || [];
+
+    /* Group by role */
+    var driverList = drivers.filter(function(d){ return d.role === 'driver'; });
+    var vanboyList = drivers.filter(function(d){ return d.role === 'vanboy'; });
+
+    var html = '<option value="">— เลือกพนักงาน —</option>';
+    if (driverList.length) {
+      html += '<optgroup label="คนขับ">';
+      driverList.forEach(function(d){
+        html += '<option value="' + d.driver_id + '">' + d.driver_name + ' · ' + (d.vehicle_type||'') + '</option>';
+      });
+      html += '</optgroup>';
+    }
+    if (vanboyList.length) {
+      html += '<optgroup label="Vanboy">';
+      vanboyList.forEach(function(d){
+        html += '<option value="' + d.driver_id + '">' + d.driver_name + ' · ' + (d.vehicle_type||'') + '</option>';
+      });
+      html += '</optgroup>';
+    }
+    sel.innerHTML = html;
+    sel.disabled = false;
+
+  } catch(err) {
+    sel.innerHTML = '<option value="">— โหลดไม่สำเร็จ —</option>';
+    sel.disabled = false;
+    showToast('โหลดรายชื่อไม่ได้: ' + err.message, true);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOAD LEAVE LIST
+═══════════════════════════════════════════════════════ */
+async function loadLeaveList() {
+  document.getElementById('list-wrap').innerHTML = '<div class="empty-state">กำลังโหลด...</div>';
+
+  try {
+    var data = await gasGet({ fn: 'getLeaveList', month: currentMonth });
+    leaveList = data.leaves || [];
+    updateStats();
+    renderList();
+  } catch(err) {
+    document.getElementById('list-wrap').innerHTML =
+      '<div class="empty-state">โหลดรายการไม่สำเร็จ<br><small>' + err.message + '</small></div>';
+  }
+}
+
+function updateStats() {
+  var counts = { BL:0, SL:0, EL:0, AL:0, OFF:0 };
+  leaveList.forEach(function(l){ if (counts[l.leave_type] !== undefined) counts[l.leave_type]++; });
+  Object.keys(counts).forEach(function(k){
+    var el = document.getElementById('cnt-' + k);
+    if (el) el.textContent = counts[k];
+  });
+  var drivers_set = new Set(leaveList.map(function(l){ return l.driver_id; }));
+  document.getElementById('stat-total').textContent   = leaveList.length;
+  document.getElementById('stat-drivers').textContent = drivers_set.size;
+}
+
+function renderList() {
+  var q    = (document.getElementById('search-inp').value || '').toLowerCase();
+  var type = document.getElementById('filter-type').value;
+
+  var filtered = leaveList.filter(function(l) {
+    if (type !== 'all' && l.leave_type !== type) return false;
+    if (q && !l.driver_name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if (!filtered.length) {
+    document.getElementById('list-wrap').innerHTML = '<div class="empty-state">ไม่พบรายการครับ</div>';
+    document.getElementById('list-footer').textContent = '';
+    return;
+  }
+
+  var typeColor = { BL:'lb-BL', SL:'lb-SL', EL:'lb-EL', AL:'lb-AL', OFF:'lb-OFF' };
+  var dotColor  = { BL:'#85B7EB', SL:'#FAC775', EL:'#ED93B1', AL:'#F0997B', OFF:'#D0CECC' };
+
+  var h = '<div style="overflow-x:auto"><table class="lt"><thead><tr>'
+    + '<th>พนักงาน</th><th>ประเภท</th><th>วันที่</th>'
+    + '<th>ระยะเวลา</th><th>หมายเหตุ</th><th></th>'
+    + '</tr></thead><tbody>';
+
+  filtered.forEach(function(l) {
+    var halfTag = (!l.is_full_day)
+      ? '<span class="half-tag">ครึ่งวัน</span>' : '';
+    var timeStr = (!l.is_full_day && l.start_time && l.end_time)
+      ? l.start_time.slice(0,5) + '–' + l.end_time.slice(0,5)
+      : 'เต็มวัน';
+    var dateStr = formatDateThai(l.leave_date_from || l.leave_date, l.leave_date_to || l.leave_date);
+
+    h += '<tr>'
+      + '<td><b style="font-size:11px">' + l.driver_name + '</b>'
+      + '<br><span style="font-size:9px;color:var(--t3)">' + (l.driver_meta||'') + '</span></td>'
+      + '<td><span class="ltb ' + (typeColor[l.leave_type]||'') + '">'
+      + '<div style="width:7px;height:7px;border-radius:1px;background:' + (dotColor[l.leave_type]||'#ccc') + ';flex-shrink:0"></div>'
+      + l.leave_type + '</span>' + halfTag + '</td>'
+      + '<td>' + dateStr + '</td>'
+      + '<td>' + timeStr + '</td>'
+      + '<td style="color:var(--t2)">' + (l.note||'—') + '</td>'
+      + '<td><button class="btn-del" onclick="deleteLeave(\'' + l.leave_id + '\')">ลบ</button></td>'
+      + '</tr>';
+  });
+
+  h += '</tbody></table></div>';
+  document.getElementById('list-wrap').innerHTML = h;
+  document.getElementById('list-footer').textContent =
+    'แสดง ' + filtered.length + ' / ' + leaveList.length + ' รายการ';
+}
+
+/* ═══════════════════════════════════════════════════════
+   CHECK CONFLICT
+═══════════════════════════════════════════════════════ */
+async function checkConflict() {
+  var drvId = document.getElementById('f-driver').value;
+  var ds    = document.getElementById('f-ds').value;
+  var de    = document.getElementById('f-de').value;
+  var alert = document.getElementById('conflict-alert');
+  alert.classList.remove('show');
+  if (!drvId || !ds || !de) return;
+  try {
+    var data = await gasGet({ fn:'checkConflict', driverId:drvId, dateFrom:ds, dateTo:de });
+    if (data.hasConflict) alert.classList.add('show');
+  } catch(e) { /* silent */ }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SAVE LEAVE
+═══════════════════════════════════════════════════════ */
+async function saveLeave() {
+  var drvId = document.getElementById('f-driver').value;
+  var ds    = document.getElementById('f-ds').value;
+  var de    = document.getElementById('f-de').value;
+  var note  = document.getElementById('f-note').value;
+
+  if (!drvId) { alert('กรุณาเลือกพนักงานก่อนครับ'); return; }
+  if (!ds || !de) { alert('กรุณาเลือกวันที่ก่อนครับ'); return; }
+  if (de < ds) { alert('วันสิ้นสุดต้องไม่ก่อนวันเริ่มครับ'); return; }
+
+  var payload = {
+    fn         : 'saveLeave',
+    driver_id  : drvId,
+    date_from  : ds,
+    date_to    : de,
+    leave_type : leaveType,
+    is_full_day: isFullDay,
+    start_time : isFullDay ? null : document.getElementById('f-ts').value,
+    end_time   : isFullDay ? null : document.getElementById('f-te').value,
+    note       : note,
+    created_by : 'HR',
+  };
+
+  var btn = document.getElementById('btn-save');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner-sm"></div> กำลังบันทึก...';
+
+  try {
+    var res = await gasPost(payload);
+    if (res.success) {
+      showToast('บันทึกสำเร็จ ' + (res.rowsInserted||1) + ' รายการ');
+      clearForm();
+      await loadLeaveList();
+    } else {
+      throw new Error(res.error || 'Unknown error');
+    }
+  } catch(err) {
+    showToast('บันทึกไม่สำเร็จ: ' + err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 7-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> บันทึก → Supabase';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   DELETE LEAVE
+═══════════════════════════════════════════════════════ */
+async function deleteLeave(leaveId) {
+  if (!confirm('ลบรายการนี้ใช่ไหมครับ?')) return;
+  try {
+    var res = await gasPost({ fn:'deleteLeave', leave_id: leaveId });
+    if (res.success) {
+      showToast('ลบเรียบร้อยแล้วครับ');
+      await loadLeaveList();
+    } else {
+      throw new Error(res.error || 'Unknown error');
+    }
+  } catch(err) {
+    showToast('ลบไม่สำเร็จ: ' + err.message, true);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   UI HELPERS
+═══════════════════════════════════════════════════════ */
+function selType(el, type) {
+  document.querySelectorAll('.lto').forEach(function(e){ e.classList.remove('sel'); });
+  el.classList.add('sel');
+  leaveType = type;
+}
+
+function setDuration(v, el) {
+  document.querySelectorAll('.fhb').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  isFullDay = v === 'full';
+  document.getElementById('time-fields').classList.toggle('show', !isFullDay);
+}
+
+function onDriverChange() {
+  checkConflict();
+}
+
+function clearForm() {
+  document.getElementById('f-driver').value = '';
+  document.getElementById('f-ds').value = '';
+  document.getElementById('f-de').value = '';
+  document.getElementById('f-note').value = '';
+  document.querySelectorAll('.lto').forEach(function(e){ e.classList.remove('sel'); });
+  document.querySelector('.lto').classList.add('sel');
+  leaveType = 'BL';
+  document.querySelectorAll('.fhb').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelector('.fhb').classList.add('active');
+  isFullDay = true;
+  document.getElementById('time-fields').classList.remove('show');
+  document.getElementById('conflict-alert').classList.remove('show');
+}
+
+function filterList(q) {
+  renderList();
+}
+
+function onMonthChange() {
+  currentMonth = document.getElementById('sb-month').value;
+  updatePbar();
+  loadLeaveList();
+}
+
+function shiftMonth(dir) {
+  var d = new Date(currentMonth + '-01');
+  d.setMonth(d.getMonth() + dir);
+  currentMonth = d.toISOString().slice(0,7);
+  /* update select */
+  var sel = document.getElementById('sb-month');
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === currentMonth) { sel.selectedIndex = i; break; }
+  }
+  updatePbar();
+  loadLeaveList();
+}
+
+function updatePbar() {
+  var thaiMonths = ['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  var parts = currentMonth.split('-');
+  var m = parseInt(parts[1]), y = parseInt(parts[0]) + 543;
+  document.getElementById('pbar-title').textContent = thaiMonths[m] + ' ' + y;
+}
+
+function formatDateThai(from, to) {
+  var thaiMonths = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var df = new Date(from), dt = to ? new Date(to) : null;
+  var m = thaiMonths[df.getMonth()+1];
+  var y = df.getFullYear() + 543;
+  if (!dt || from === to) return df.getDate() + ' ' + m + ' ' + y;
+  if (df.getMonth() === dt.getMonth()) return df.getDate() + '–' + dt.getDate() + ' ' + m + ' ' + y;
+  return df.getDate() + ' ' + m + ' – ' + dt.getDate() + ' ' + thaiMonths[dt.getMonth()+1] + ' ' + y;
+}
+
+function showToast(msg, isError) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.style.background = isError ? 'var(--r7)' : 'var(--g7)';
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3500);
+}
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+updatePbar();
+
+/* Set today as default date */
+var today = new Date().toISOString().slice(0,10);
+document.getElementById('f-ds').value = today;
+document.getElementById('f-de').value = today;
+
+if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+  /* Show placeholder when GAS not configured */
+  document.getElementById('f-driver').innerHTML =
+    '<option>— ตั้งค่า GAS_URL ก่อนครับ —</option>';
+  document.getElementById('list-wrap').innerHTML =
+    '<div class="empty-state">'
+    + '<b style="color:var(--t1)">ยังไม่ได้ตั้งค่า GAS URL</b><br>'
+    + 'แก้ไข GAS_URL ในไฟล์ hr.html ก่อนครับ'
+    + '</div>';
+} else {
+  loadDrivers();
+  loadLeaveList();
+}
+</script>
+</body>
+</html>

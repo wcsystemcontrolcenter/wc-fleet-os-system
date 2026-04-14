@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WC Fleet OS</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════ */
+:root{
+  --brand:#016F30; --brand-dk:#014D22; --brand-lt:#E8F5EE;
+  --bg:#F5F4F0; --sf:#FFF; --s2:#EEEDE8; --s3:#E6E4DE;
+  --bd:#DDDBD3; --bd2:#C9C7BE;
+  --t1:#1A1916; --t2:#6A6860; --t3:#A8A69D;
+  --g50:#D4F0E3; --g4:#2BAF74; --g7:#0A5C37;
+  --r50:#FCDEDE; --r4:#DC4F4F; --r7:#6B1616;
+  --b50:#DAE9FC; --b4:#3D7ED6; --b7:#163D72;
+  --a50:#FEF0CD; --a4:#CC920C; --a7:#5A3903;
+  --pk50:#FADBEE; --pk4:#CC4F86; --pk7:#601232;
+  --cr50:#FCEAE2; --cr4:#D16040; --cr7:#652210;
+  --pu50:#ECEAFD; --pu4:#6454D0; --pu7:#2A1C78;
+  --gy50:#EEECEA; --gy4:#888680; --gy7:#3C3B38;
+  --sb:220px;
+  --font:'IBM Plex Sans Thai',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:12px;display:flex;flex-direction:column}
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+.nav{
+  height:44px;background:var(--brand);
+  display:flex;align-items:stretch;flex-shrink:0;z-index:60;
+}
+.nav-logo{
+  width:var(--sb);display:flex;align-items:center;padding:0 16px;
+  font-size:13px;font-weight:600;color:#fff;letter-spacing:-.3px;
+  border-right:1px solid rgba(255,255,255,.15);flex-shrink:0;gap:8px;
+}
+.nav-logo-icon{opacity:.85}
+.nav-logo-text{line-height:1.2}
+.nav-logo-text small{display:block;font-size:9px;font-weight:400;opacity:.7;letter-spacing:.02em}
+.nav-tabs{display:flex;align-items:stretch}
+.ntab{
+  padding:0 16px;font-size:11px;font-weight:500;
+  color:rgba(255,255,255,.55);border:none;background:transparent;
+  cursor:pointer;font-family:var(--font);
+  border-bottom:2px solid transparent;
+  display:flex;align-items:center;gap:6px;
+  white-space:nowrap;transition:all .15s;
+}
+.ntab.active{color:#fff;border-bottom-color:rgba(255,255,255,.9)}
+.ntab:hover:not(.active){color:rgba(255,255,255,.85)}
+.nav-sp{flex:1}
+.hr-btn{
+  margin:10px 14px;padding:0 12px;
+  background:rgba(255,255,255,.12);color:#fff;
+  border:1px solid rgba(255,255,255,.25);border-radius:5px;
+  font-size:10px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:5px;font-family:var(--font);
+  text-decoration:none;transition:background .12s;
+}
+.hr-btn:hover{background:rgba(255,255,255,.22)}
+
+/* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+.app{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ── */
+.sb{
+  width:var(--sb);flex-shrink:0;
+  background:var(--sf);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.sb-sec{padding:12px 14px;border-bottom:1px solid var(--bd)}
+.sb-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.fsel{
+  width:100%;padding:6px 8px;border:1px solid var(--bd);border-radius:6px;
+  font-size:11px;background:var(--sf);color:var(--t1);
+  cursor:pointer;font-family:var(--font);outline:none;margin-bottom:6px;
+}
+.fsel:last-of-type{margin-bottom:0}
+.fsel:focus{border-color:var(--pu4)}
+.sb-reset{
+  width:100%;padding:6px;border:1px solid var(--bd);border-radius:6px;
+  font-size:11px;background:transparent;color:var(--t2);
+  cursor:pointer;font-family:var(--font);margin-top:6px;
+}
+.sb-reset:hover{background:var(--s2)}
+.sb-cnt{font-size:10px;color:var(--t2);text-align:center;padding:5px 0 0}
+.leg{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:10px;color:var(--t2)}
+.lb{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.sb-note{font-size:9px;color:var(--t3);line-height:1.6;margin-top:6px}
+.sb-refresh{
+  display:flex;align-items:center;gap:6px;padding:8px 14px;
+  font-size:10px;color:var(--t2);cursor:pointer;
+  border-bottom:1px solid var(--bd);
+  transition:background .1s;
+}
+.sb-refresh:hover{background:var(--s2)}
+.sb-refresh svg{flex-shrink:0}
+.last-updated{font-size:9px;color:var(--t3);flex:1}
+
+/* ── Content ── */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Period bar ── */
+.pbar{
+  height:48px;background:var(--sf);border-bottom:1px solid var(--bd);
+  padding:0 20px;display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.pb{
+  width:28px;height:28px;border:1px solid var(--bd);border-radius:6px;
+  background:var(--sf);color:var(--t2);cursor:pointer;
+  font-size:14px;display:flex;align-items:center;justify-content:center;
+}
+.pb:hover{background:var(--s2)}
+.today-btn{
+  padding:0 10px;height:28px;border:1px solid var(--bd);border-radius:6px;
+  font-size:11px;font-weight:500;background:var(--sf);color:var(--t1);
+  cursor:pointer;font-family:var(--font);
+}
+.today-btn:hover{background:var(--s2)}
+.ptitle{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.3px}
+.psub{font-size:10px;color:var(--t2);margin-top:1px}
+.psp{flex:1}
+.tg{display:flex;background:var(--s2);border-radius:7px;padding:3px;border:1px solid var(--bd)}
+.tgb{
+  padding:4px 10px;border-radius:5px;font-size:11px;font-weight:500;
+  border:none;cursor:pointer;background:transparent;color:var(--t2);
+  font-family:var(--font);transition:all .12s;white-space:nowrap;
+}
+.tgb.active{background:var(--sf);color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tg-sep{width:1px;height:16px;background:var(--bd);margin:0 3px;align-self:center}
+.period-tg{display:flex;align-items:center;gap:0;transition:opacity .2s}
+.period-tg.hide{opacity:0;pointer-events:none}
+.hourly-lbl{font-size:11px;color:var(--t2);display:none;white-space:nowrap}
+.hourly-lbl.show{display:block}
+
+/* ── Table area ── */
+.tbl-outer{flex:1;overflow:auto;padding:12px 20px 40px}
+.vs{display:none}.vs.active{display:block}
+
+/* ── Loading / Error states ── */
+.state-box{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 20px;color:var(--t2);gap:12px;
+}
+.state-box svg{opacity:.3}
+.state-box p{font-size:13px}
+.state-box small{font-size:11px;color:var(--t3)}
+.spinner{
+  width:24px;height:24px;border:2px solid var(--bd);
+  border-top-color:var(--brand);border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════════════
+   TABLE — SHARED
+═══════════════════════════════════════ */
+table{
+  border-collapse:collapse;background:var(--sf);
+  border-radius:10px;border:1px solid var(--bd);
+  overflow:hidden;width:100%;
+}
+thead tr.r1 th{position:sticky;top:0;z-index:8}
+thead tr.r2 th{position:sticky;top:37px;z-index:8}
+thead tr.r3 th{position:sticky;top:58px;z-index:8}
+thead th{
+  background:var(--s2);border-bottom:1px solid var(--bd);
+  padding:5px 2px;text-align:center;font-weight:500;
+  font-size:10px;color:var(--t2);white-space:nowrap;min-width:60px;
+}
+thead th.thd{
+  text-align:left;padding-left:12px;width:190px;min-width:190px;
+  left:0;z-index:10;background:var(--s2);
+}
+thead th.ths {background:#E5F6EE;color:var(--g7);min-width:30px;font-weight:600}
+thead th.thsp{background:#FDEAEA;color:var(--r7);min-width:30px;font-weight:600}
+thead th.thtr{background:#E2EDFC;color:var(--b7);min-width:30px;font-weight:600}
+thead th.thu {background:var(--pu50);color:var(--pu7);min-width:56px;font-size:9px}
+thead th.tsat{color:var(--t3)}
+thead th.tsun{background:#FDEAEA;color:var(--r4)}
+thead th.ttod{background:#FFF5DC;color:#7A4E00}
+
+/* util pinned rows */
+thead tr.r2 th{background:#F0EEFE;border-bottom:1px solid #D4D0F0;padding:3px 2px;font-weight:400;font-size:9px}
+thead tr.r2 th.thd{background:#E8E5FB;text-align:left;padding-left:12px;left:0;z-index:10}
+thead tr.r3 th{background:#E7E4F8;border-bottom:2px solid #B8B3E8;padding:3px 2px;font-weight:400;font-size:9px}
+thead tr.r3 th.thd{background:#DDD9F5;text-align:left;padding-left:12px;left:0;z-index:10}
+thead tr.r2 th.tsun,thead tr.r3 th.tsun{background:#FDEAEA}
+thead tr.r2 th.ttod,thead tr.r3 th.ttod{background:#FFF5DC}
+
+/* formula tooltip */
+.iw{display:flex;align-items:center;gap:4px;position:relative}
+.utl{font-size:9px;font-weight:600;color:#3B2FA0}
+.utlt{color:#4D44B0}
+.uts{font-size:8px;color:#7B74CC;display:block;margin-top:1px}
+.ii{
+  width:13px;height:13px;border-radius:50%;background:#B8B4E8;
+  color:#26215C;font-size:8px;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:default;flex-shrink:0;
+}
+.ii:hover+.ft{display:block}
+.ft{
+  display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:300;
+  background:var(--sf);border:1px solid var(--bd2);border-radius:8px;
+  padding:10px 12px;width:215px;font-size:11px;color:var(--t1);
+  line-height:1.7;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.1);
+}
+.ft::before{content:'';position:absolute;bottom:100%;left:10px;border:5px solid transparent;border-bottom-color:var(--bd2)}
+.ft-h{font-weight:600;font-size:11px;color:#3B2FA0;margin-bottom:4px}
+.ft-f{background:var(--pu50);border-radius:4px;padding:5px 8px;font-size:10px;font-family:var(--mono);color:#3B2FA0;margin:4px 0;line-height:1.5}
+.ft-n{font-size:10px;color:var(--t2)}
+.ud{font-size:10px;font-weight:600;color:#3B2FA0}
+.ut{font-size:10px;font-weight:600;color:#4D44B0}
+.usun{color:var(--r4)!important}
+.ubar{height:3px;background:var(--s3);border-radius:2px;margin:2px 8px 0}
+.ubf{height:3px;background:#6454D0;border-radius:2px}
+
+/* body rows */
+tbody tr{border-bottom:1px solid var(--bd);transition:background .08s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover td{background:#FAFAF7}
+tbody tr:hover td.tdd{background:#FAFAF7}
+td{padding:3px 2px;text-align:center;vertical-align:top;min-width:60px}
+td.tdd{
+  text-align:left;padding:7px 8px 7px 12px;
+  width:190px;min-width:190px;
+  position:sticky;left:0;background:var(--sf);
+  border-right:1px solid var(--bd);z-index:2;vertical-align:middle;
+}
+td.tds {background:#E5F6EE;font-weight:600;font-size:11px;color:var(--g7);text-align:center;vertical-align:middle;min-width:30px}
+td.tdps{background:#FDEAEA;font-weight:600;font-size:11px;color:var(--r7);text-align:center;vertical-align:middle;min-width:30px}
+td.tdtr{background:#E2EDFC;font-weight:600;font-size:11px;color:var(--b7);text-align:center;vertical-align:middle;min-width:30px}
+td.tdu {background:#F0EEFE;text-align:center;vertical-align:middle;min-width:56px;padding:4px 3px}
+td.scol{background:#FFF6F6}
+
+/* row labels */
+.rname{font-weight:600;font-size:11px;color:var(--t1);line-height:1.3}
+.rmeta{font-size:9px;color:var(--t2);margin-top:1px}
+.rtags{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap}
+.tag{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:600}
+.tg-has{background:var(--g50);color:var(--g7)}
+.tg-no{background:var(--gy50);color:var(--gy7)}
+.tg-dr{background:var(--pu50);color:var(--pu7)}
+.tg-vb{background:var(--a50);color:var(--a7)}
+.tg-pu{background:var(--b50);color:var(--b7)}
+.tg-ft{background:var(--cr50);color:var(--cr7)}
+.tg-wc{background:var(--g50);color:var(--g7)}
+.tg-idle{background:var(--r50);color:var(--r7)}
+
+/* per-row util */
+.ru{display:flex;flex-direction:column;gap:2px}
+.rur{display:flex;align-items:center;gap:3px;justify-content:center}
+.rul{font-size:8px;color:var(--t3);width:24px;text-align:right;flex-shrink:0}
+.rud{font-size:11px;font-weight:600;color:#3B2FA0}
+.rut{font-size:11px;font-weight:600;color:#4D44B0}
+.rub{flex:1;height:3px;background:var(--bd);border-radius:2px;overflow:hidden;max-width:24px}
+.ruf{height:3px;background:#6454D0;border-radius:2px}
+
+/* ═══════════════════════════════════════
+   DAILY CELLS
+═══════════════════════════════════════ */
+.cw  {background:var(--g50);border-radius:4px;padding:3px;margin:1px 2px;cursor:default;position:relative}
+.cp  {background:repeating-linear-gradient(45deg,#F09595,#F09595 3px,#FCDEDE 3px,#FCDEDE 6px);border-radius:4px;padding:3px;margin:1px 2px;cursor:default;position:relative}
+.cbl {background:var(--b50);border-radius:4px;padding:3px;margin:1px 2px;cursor:default;position:relative}
+.csl {background:var(--a50);border-radius:4px;padding:3px;margin:1px 2px;cursor:default;position:relative}
+.cel {background:var(--pk50);border-radius:4px;padding:3px;margin:1px 2px;cursor:default;position:relative}
+.cal {background:var(--cr50);border-radius:4px;padding:3px;margin:1px 2px;cursor:default;position:relative}
+.cof {background:var(--gy50);border-radius:4px;padding:3px;margin:1px 2px;cursor:default;position:relative}
+.cx  {padding:3px 2px;margin:1px 2px}
+.cw2 {background:var(--g50);border-left:3px solid var(--g4);border-radius:4px;padding:3px;margin:1px 2px;cursor:default;position:relative}
+.ss  {background:var(--g50);border-radius:4px 0 0 4px;padding:3px 2px 3px 3px;margin:1px 0 1px 2px;cursor:default;position:relative}
+.sm  {background:var(--g50);padding:3px 0;margin:1px 0}
+.se  {background:var(--g50);border-radius:0 4px 4px 0;padding:3px 3px 3px 2px;margin:1px 2px 1px 0}
+.sl  {display:block;height:2px;background:var(--g4);border-radius:1px;margin:4px 3px 2px}
+
+.bdg{display:block;font-size:10px;font-weight:700;line-height:1.2}
+.bW{color:var(--g7)}.bP{color:var(--r7)}.bBL{color:var(--b7)}
+.bSL{color:var(--a7)}.bEL{color:var(--pk7)}.bAL{color:var(--cr7)}
+.bOF{color:var(--gy7)}.bx{color:var(--t3)}
+.ci{font-size:8px;line-height:1.3;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56px}
+.cg{color:var(--g7)}.cit{color:#085041;font-style:italic}
+.cm{color:var(--t2)}.ct{color:#7A4500;margin-top:2px}
+.multi{font-size:8px;background:#FFF0CD;color:var(--a7);padding:1px 5px;border-radius:3px;font-weight:600;margin-top:2px;display:inline-block}
+
+/* ═══════════════════════════════════════
+   TOOLTIP
+═══════════════════════════════════════ */
+.has-tt{position:relative;cursor:default}
+.has-tt:hover>.tt{display:block}
+.tt{
+  display:none;position:absolute;z-index:999;
+  bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);
+  background:var(--sf);border:1px solid var(--bd2);border-radius:9px;
+  padding:10px 12px;min-width:198px;max-width:240px;
+  font-size:11px;color:var(--t1);line-height:1.75;
+  white-space:normal;pointer-events:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.12);
+}
+.tt::after{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:var(--bd2);
+}
+.tt-tl{font-size:10px;font-weight:600;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--bd)}
+.ttr{display:flex;justify-content:space-between;gap:8px}
+.ttl{color:var(--t2);flex-shrink:0;font-size:10px}
+.ttv{font-weight:500;text-align:right;font-size:10px}
+.ttsep{border:none;border-top:1px solid var(--bd);margin:4px 0}
+.tt-drv-row{display:flex;align-items:flex-start;gap:5px;font-size:10px;padding:2px 0}
+.tt-dot{width:6px;height:6px;border-radius:50%;background:var(--g4);flex-shrink:0;margin-top:3px}
+
+/* ═══════════════════════════════════════
+   HOURLY
+═══════════════════════════════════════ */
+.h-tbl thead th{min-width:30px}
+.h-tbl thead th.thd{width:148px;min-width:148px}
+.h-tbl thead th.thday{
+  width:54px;min-width:54px;left:148px;z-index:6;
+  background:var(--s2);font-size:10px;
+  position:sticky;top:0;
+}
+.h-tbl thead th.thk{color:var(--t1);font-weight:600;background:#F0EEFE;font-size:10px}
+.h-tbl thead th.hthu{background:var(--pu50);color:var(--pu7);min-width:56px;font-size:9px}
+.h-tbl tbody tr.dfirst td{border-top:1.5px solid var(--bd2)}
+.h-tbl tbody tr.dsat td{background:#FDFCF8}
+.h-tbl tbody tr.dsun td{background:#FFF6F6}
+.h-tbl td{min-width:30px}
+.h-tbl td.tdd{width:148px;min-width:148px;vertical-align:top;padding:6px 6px 6px 12px}
+.h-tbl td.tday{
+  text-align:center;width:54px;min-width:54px;
+  position:sticky;left:148px;background:var(--sf);
+  border-right:1px solid var(--bd);z-index:2;padding:5px 4px;vertical-align:top;
+}
+.h-tbl td.thr{padding:0;min-width:30px;position:relative}
+.h-tbl td.htdu{background:#F0EEFE;text-align:center;vertical-align:middle;min-width:56px;padding:4px;border-left:1px solid #D4D0F0}
+.dlbl{display:block;font-size:11px;font-weight:500;color:var(--t2);line-height:1.3}
+.dlbl.today{color:#7A4E00}.dlbl.sun{color:var(--r4)}.dlbl.sat{color:var(--t3)}
+.djobs{font-size:9px;color:var(--t3);margin-top:2px}
+.dlayers{font-size:9px;color:var(--pu4);font-weight:600;margin-top:1px}
+
+.jb{height:21px;border-radius:3px;display:flex;align-items:center;padding:0 4px;overflow:hidden;white-space:nowrap;cursor:default;position:relative}
+.jb span{font-size:9px;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.jw {background:#5DCAA5}.jw  span{color:#04342C}
+.jp2{background:repeating-linear-gradient(45deg,#F09595,#F09595 3px,#FCDEDE 3px,#FCDEDE 6px)}.jp2 span{color:var(--r7)}
+.jbl{background:#85B7EB}.jbl span{color:var(--b7)}
+.jsl{background:#FAC775}.jsl span{color:var(--a7)}
+.jel{background:#ED93B1}.jel span{color:var(--pk7)}
+.jal{background:#F0997B}.jal span{color:var(--cr7)}
+.jof{background:#D0CECC}.jof span{color:var(--gy7)}
+.jb.has-tt:hover>.tt{display:block}
+
+tfoot td{background:var(--pu50);border-top:1.5px solid #B8B3E8;padding:3px 2px;text-align:center;font-size:9px;font-weight:500;color:var(--pu7);min-width:30px}
+tfoot td.tfd{background:#E4E2F8;text-align:left;padding-left:12px;position:sticky;left:0;z-index:2;font-size:10px;color:#4D44B0}
+tfoot td.tfday{background:#E4E2F8;position:sticky;left:148px;z-index:2;font-size:9px;color:#4D44B0}
+tfoot td.tfu{background:#DDD9F5;color:#2A1C78;font-weight:700;border-left:1px solid #B8B3E8}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     NAV
+═══════════════════════════════════════ -->
+<div class="nav">
+  <div class="nav-logo">
+    <svg class="nav-logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <rect x="1" y="6" width="22" height="13" rx="2.5" stroke="white" stroke-width="1.6"/>
+      <path d="M4 6V4.5A1.5 1.5 0 015.5 3h13A1.5 1.5 0 0120 4.5V6" stroke="white" stroke-width="1.6"/>
+      <circle cx="6.5" cy="19" r="2.5" fill="white"/>
+      <circle cx="17.5" cy="19" r="2.5" fill="white"/>
+      <path d="M9 19h6" stroke="white" stroke-width="1.6"/>
+    </svg>
+    <div class="nav-logo-text">
+      WC Fleet <b>OS</b>
+      <small>Fleet Management System</small>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="ntab active" id="nm-p" onclick="switchMain('people')">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="2.8" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3 2.5-4.8 6-4.8s6 1.8 6 4.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      People
+    </button>
+    <button class="ntab" id="nm-v" onclick="switchMain('vehicle')">
+      <svg width="16" height="13" viewBox="0 0 20 16" fill="none"><rect x="1" y="5" width="18" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 5l2.5-4h9L17 5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="5.5" cy="14" r="2" fill="currentColor"/><circle cx="14.5" cy="14" r="2" fill="currentColor"/></svg>
+      Vehicle
+    </button>
+  </div>
+  <div class="nav-sp"></div>
+  <a class="hr-btn" href="hr.html" target="_blank">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 8h6M5 5.5h6M5 10.5h3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    จัดการวันลา (HR)
+  </a>
+</div>
+
+<!-- ═══════════════════════════════════════
+     APP
+═══════════════════════════════════════ -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sb">
+    <!-- Refresh -->
+    <div class="sb-refresh" onclick="refreshData()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13.5 8A5.5 5.5 0 112.5 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13.5 4v4h-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="last-updated" id="last-updated">กด Refresh เพื่อโหลดข้อมูล</span>
+    </div>
+    <!-- Period -->
+    <div class="sb-sec">
+      <div class="sb-lbl">Period</div>
+      <select class="fsel" id="sb-period" onchange="onPeriodChange()">
+        <option value="2025-04-01|2025-04-15">1–15 เม.ย. 2568</option>
+        <option value="2025-04-16|2025-04-30">16–30 เม.ย. 2568</option>
+        <option value="2025-03-01|2025-03-15">1–15 มี.ค. 2568</option>
+      </select>
+    </div>
+    <!-- Filters -->
+    <div class="sb-sec" id="sb-filters"></div>
+    <!-- Legend -->
+    <div class="sb-sec" id="sb-legend"></div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- PERIOD BAR -->
+    <div class="pbar">
+      <div style="display:flex;align-items:center;gap:4px">
+        <button class="pb" onclick="shiftPeriod(-1)">&#8249;</button>
+        <button class="today-btn" onclick="goToday()">วันนี้</button>
+        <button class="pb" onclick="shiftPeriod(1)">&#8250;</button>
+      </div>
+      <div>
+        <div class="ptitle" id="pbar-title">1–15 เม.ย. 2568</div>
+        <div class="psub" id="pbar-sub">People view · Own Fleet</div>
+      </div>
+      <div class="psp"></div>
+
+      <!-- Daily / Hourly -->
+      <div class="tg">
+        <button class="tgb active" id="tg-daily"  onclick="switchSub('daily')">Daily</button>
+        <button class="tgb"        id="tg-hourly" onclick="switchSub('hourly')">Hourly</button>
+      </div>
+
+      <!-- 15/7/30 — Daily only -->
+      <div class="period-tg" id="period-tg">
+        <div class="tg-sep"></div>
+        <div class="tg">
+          <button class="tgb active" onclick="switchN(15,this)">15 วัน</button>
+          <button class="tgb"        onclick="switchN(7,this)">7 วัน</button>
+          <button class="tgb"        onclick="switchN(30,this)">30 วัน</button>
+        </div>
+      </div>
+
+      <!-- Week label — Hourly only -->
+      <div class="hourly-lbl" id="hourly-lbl"></div>
+    </div>
+
+    <!-- VIEW CONTAINERS -->
+    <div class="tbl-outer">
+      <div class="vs active" id="v-people-daily"></div>
+      <div class="vs"        id="v-people-hourly"></div>
+      <div class="vs"        id="v-vehicle-daily"></div>
+      <div class="vs"        id="v-vehicle-hourly"></div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end app -->
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   CONFIG — แก้ GAS_URL หลัง deploy GAS
+═══════════════════════════════════════════════════════ */
+var GAS_URL = 'YOUR_GAS_WEB_APP_URL_HERE';
+
+/* ═══════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════ */
+var S = {
+  main    : 'people',   // 'people' | 'vehicle'
+  sub     : 'daily',    // 'daily'  | 'hourly'
+  n       : 15,         // 15 | 7 | 30
+  dateFrom: '2025-04-01',
+  dateTo  : '2025-04-15',
+  cache   : {},         // key → {data, ts}
+  CACHE_MS: 5 * 60 * 1000,
+};
+
+/* ═══════════════════════════════════════════════════════
+   GAS FETCH
+═══════════════════════════════════════════════════════ */
+async function fetchGAS(params) {
+  var key = JSON.stringify(params);
+  var now = Date.now();
+  if (S.cache[key] && (now - S.cache[key].ts) < S.CACHE_MS) {
+    return S.cache[key].data;
+  }
+  var qs = Object.entries(params).map(function(e){
+    return encodeURIComponent(e[0]) + '=' + encodeURIComponent(e[1]);
+  }).join('&');
+  var res = await fetch(GAS_URL + '?' + qs);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  var data = await res.json();
+  S.cache[key] = { data: data, ts: now };
+  return data;
+}
+
+async function refreshData() {
+  S.cache = {};
+  document.getElementById('last-updated').textContent = 'กำลังโหลด...';
+  await loadView();
+  var now = new Date();
+  document.getElementById('last-updated').textContent =
+    'อัปเดต ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0') + ' น.';
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOAD VIEW
+═══════════════════════════════════════════════════════ */
+async function loadView() {
+  var id = 'v-' + S.main + '-' + S.sub;
+  document.querySelectorAll('.vs').forEach(function(v){ v.classList.remove('active'); });
+  var el = document.getElementById(id);
+  el.classList.add('active');
+
+  /* show loading */
+  el.innerHTML = '<div class="state-box"><div class="spinner"></div><p>กำลังโหลดข้อมูล...</p></div>';
+
+  try {
+    var params = {
+      fn      : S.sub === 'daily' ? 'getDailyStatus' : 'getHourlyStatus',
+      mode    : S.main,
+      dateFrom: S.dateFrom,
+      dateTo  : S.dateTo,
+    };
+    var data = await fetchGAS(params);
+
+    if (S.sub === 'daily')  el.innerHTML = buildDaily(data);
+    else                    el.innerHTML = buildHourly(data);
+
+  } catch(err) {
+    el.innerHTML = '<div class="state-box">'
+      + '<svg width="40" height="40" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#DDDBD3" stroke-width="1.5"/><path d="M12 8v4M12 16h.01" stroke="#DDDBD3" stroke-width="1.5" stroke-linecap="round"/></svg>'
+      + '<p>ไม่สามารถโหลดข้อมูลได้</p>'
+      + '<small>' + err.message + '</small>'
+      + '<small style="margin-top:4px">ตรวจสอบ GAS_URL หรือ network ครับ</small>'
+      + '</div>';
+    console.error('GAS fetch error:', err);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   EXPECTED GAS RESPONSE FORMAT
+   getDailyStatus → {
+     meta: { dateFrom, dateTo, fleetName },
+     days: [ { date:'2025-04-01', label:'1', dayLabel:'จ', isSun, isSat, isToday } ],
+     rows: [
+       {
+         id, name, meta, role, type, fleet,    // People
+         plate, vehicleMeta, vehicleType,       // Vehicle
+         totalW, totalP, totalTrips,
+         dayUtil, timeUtil,
+         cells: [ { status, cust, proj, doc, route, timeFrom, timeTo,
+                     note, isSpan, spanLen, driverList } ]
+       }
+     ],
+     fleetUtil: [ { date, dayUtil, timeUtil } ]
+   }
+
+   getHourlyStatus → {
+     meta: { weekLabel },
+     days: [ { di, label, isSun, isSat, isToday } ],
+     rows: [
+       {
+         id, name, meta, role, type,
+         days: [
+           { di, jobs: [ { layer, startH, endH, type, label, cust, doc, route, driverName } ] }
+         ]
+       }
+     ]
+   }
+═══════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   BUILD DAILY TABLE
+═══════════════════════════════════════════════════════ */
+function buildDaily(data) {
+  var days = data.days;
+  var rows = data.rows;
+  var isP  = S.main === 'people';
+  var n    = days.length;
+
+  var h = '<table><thead>';
+
+  /* ── Row 1: date headers ── */
+  h += '<tr class="r1"><th class="thd">' + (isP ? 'คนขับ / Vanboy' : 'รถ / Vehicle') + '</th>';
+  days.forEach(function(d) {
+    h += '<th class="' + (d.isToday?'ttod':d.isSun?'tsun':d.isSat?'tsat':'') + '">'
+      + d.label + '<br><small>' + d.dayLabel + '</small></th>';
+  });
+  h += '<th class="ths">W</th><th class="thsp">P</th><th class="thtr">Trip</th>';
+  h += '<th class="thu" colspan="2">Util%</th></tr>';
+
+  /* ── Row 2: Day Util% ── */
+  h += '<tr class="r2"><th class="thd"><div class="iw"><div>'
+    + '<span class="utl">Day Util%</span>'
+    + '<span class="uts">วันวิ่ง ÷ ' + n + '</span>'
+    + '</div><span class="ii">i</span>'
+    + '<div class="ft"><div class="ft-h">Day Utilization</div>'
+    + '<div class="ft-f">W ÷ จำนวน ' + (isP?'คน':'คัน') + ' ทั้งหมด × 100</div>'
+    + '<div class="ft-n">P, BL, SL, EL, AL, OFF ไม่นับเป็น W</div></div>'
+    + '</div></th>';
+  days.forEach(function(d) {
+    var v = data.fleetUtil ? (data.fleetUtil.find(function(f){return f.date===d.date;})||{}).dayUtil||0 : 0;
+    var cls = d.isToday?'ttod':d.isSun?'tsun':d.isSat?'tsat':'';
+    h += '<th class="' + cls + '">';
+    if (d.isSun || v === 0) h += '<div class="ud' + (d.isSun?' usun':'') + '">' + v + '%</div>';
+    else h += '<div class="ud">' + v + '%</div><div class="ubar"><div class="ubf" style="width:' + Math.min(v,100) + '%"></div></div>';
+    h += '</th>';
+  });
+  h += '<th class="ths"></th><th class="thsp"></th><th class="thtr"></th>';
+  h += '<th colspan="2" style="background:var(--pu50);text-align:center;vertical-align:middle">'
+    + '<span class="ud">' + (data.avgDayUtil||'-') + '%</span></th></tr>';
+
+  /* ── Row 3: Time Util% (People only) ── */
+  if (isP) {
+    h += '<tr class="r3"><th class="thd"><div class="iw"><div>'
+      + '<span class="utl utlt">Time Util%</span>'
+      + '<span class="uts" style="color:#7B74CC">ชม.วิ่ง ÷ 24 ชม.</span>'
+      + '</div><span class="ii" style="background:#B0ABDE">i</span>'
+      + '<div class="ft"><div class="ft-h" style="color:#4D44B0">Time Utilization</div>'
+      + '<div class="ft-f" style="color:#4D44B0">Σ ชม.วิ่ง ÷ (n × 24) × 100</div>'
+      + '<div class="ft-n">จาก job_start_from_fleet → job_completed_to_fleet</div></div>'
+      + '</div></th>';
+    days.forEach(function(d) {
+      var v = data.fleetUtil ? (data.fleetUtil.find(function(f){return f.date===d.date;})||{}).timeUtil||0 : 0;
+      var cls = d.isToday?'ttod':d.isSun?'tsun':d.isSat?'tsat':'';
+      h += '<th class="' + cls + '">';
+      if (d.isSun || v === 0) h += '<div class="ut' + (d.isSun?' usun':'') + '">' + v + '%</div>';
+      else h += '<div class="ut">' + v + '%</div><div class="ubar"><div class="ubf" style="width:' + Math.min(v,100) + '%"></div></div>';
+      h += '</th>';
+    });
+    h += '<th style="background:#E7E4F8"></th><th style="background:#E7E4F8"></th><th style="background:#E7E4F8"></th>';
+    h += '<th colspan="2" style="background:#DDD9F5;text-align:center;vertical-align:middle">'
+      + '<span class="ut">' + (data.avgTimeUtil||'-') + '%</span></th></tr>';
+  }
+  h += '</thead><tbody>';
+
+  /* ── Body rows ── */
+  rows.forEach(function(row) {
+    h += '<tr>';
+
+    /* row label */
+    if (isP) {
+      h += '<td class="tdd"><div class="rname">' + row.name + '</div>'
+        + '<div class="rmeta">' + row.meta + '</div>'
+        + '<div class="rtags">'
+        + '<span class="tag ' + (row.totalW > 0 ? 'tg-has' : 'tg-no') + '">'
+        + (row.totalW > 0 ? 'มี job' : 'ไม่มี job') + '</span>'
+        + '<span class="tag ' + (row.role==='driver'?'tg-dr':'tg-vb') + '">'
+        + (row.role==='driver'?'คนขับ':'Vanboy') + '</span>'
+        + '<span class="tag tg-pu">' + row.type + '</span>'
+        + '</div></td>';
+    } else {
+      h += '<td class="tdd"><div class="rname" style="font-family:var(--mono);letter-spacing:.04em">' + row.plate + '</div>'
+        + '<div class="rmeta">' + row.vehicleMeta + '</div>'
+        + '<div class="rtags">'
+        + '<span class="tag tg-pu">' + row.vehicleType + '</span>'
+        + '<span class="tag tg-wc">' + row.fleet + '</span>'
+        + '<span class="tag ' + (row.totalW > 0 ? 'tg-has' : 'tg-idle') + '">'
+        + (row.totalW > 0 ? 'มี job' : 'P ตลอดงวด') + '</span>'
+        + '</div></td>';
+    }
+
+    /* day cells */
+    row.cells.forEach(function(cell, ci) {
+      var d = days[ci];
+      var dcls = d.isSun ? ' class="scol"' : '';
+      h += '<td' + dcls + '>' + buildCell(cell, d, isP) + '</td>';
+    });
+
+    /* summary cols */
+    h += '<td class="tds">' + row.totalW + '</td>';
+    h += '<td class="tdps">' + row.totalP + '</td>';
+    h += '<td class="tdtr">' + row.totalTrips + '</td>';
+    h += '<td class="tdu" colspan="2"><div class="ru">'
+      + '<div class="rur"><span class="rul">Day</span><span class="rud">' + row.dayUtil + '%</span>'
+      + '<div class="rub"><div class="ruf" style="width:' + Math.min(row.dayUtil,100) + '%"></div></div></div>';
+    if (isP && row.timeUtil !== undefined) {
+      h += '<div class="rur"><span class="rul">Time</span><span class="rut">' + row.timeUtil + '%</span>'
+        + '<div class="rub"><div class="ruf" style="width:' + Math.min(row.timeUtil,100) + '%"></div></div></div>';
+    }
+    h += '</div></td></tr>';
+  });
+
+  h += '</tbody></table>';
+  return h;
+}
+
+/* Build single daily cell */
+function buildCell(cell, day, isP) {
+  var s = cell.status;
+  if (!s || s === 'NONE') return '<div class="cx"><span class="bdg bx">—</span></div>';
+
+  /* Span continuation */
+  if (s === 'SPAN_MID') return '<div class="sm"><span class="sl" style="margin:10px 3px"></span></div>';
+  if (s === 'SPAN_END') return '<div class="se"><span class="sl" style="margin:10px 3px"></span></div>';
+
+  /* P auto */
+  if (s === 'P') {
+    var ptip = ttP(cell.note);
+    return '<div class="cp has-tt"><span class="bdg bP">P</span>' + ptip + '</div>';
+  }
+
+  /* Leave types */
+  var leaveMap = {
+    BL:['cbl','bBL'], SL:['csl','bSL'], EL:['cel','bEL'],
+    AL:['cal','bAL'], OFF:['cof','bOF']
+  };
+  if (leaveMap[s]) {
+    var lc = leaveMap[s];
+    return '<div class="' + lc[0] + ' has-tt"><span class="bdg ' + lc[1] + '">' + s + '</span>'
+      + '<div class="ci" style="color:var(--t2)">' + (cell.note||s) + '</div>'
+      + ttLeave(s, cell.note) + '</div>';
+  }
+
+  /* W span start */
+  if (s === 'SPAN_START') {
+    return '<div class="ss has-tt"><span class="bdg bW">W</span>'
+      + '<div class="ci cg">' + (cell.cust||'') + '</div>'
+      + '<div class="ci cit">' + (cell.proj||'') + '</div>'
+      + '<div class="ci ct">ออก ' + (cell.timeFrom||'') + '</div>'
+      + '<span class="sl"></span>'
+      + ttW('งานข้ามวัน', cell, isP) + '</div>';
+  }
+
+  /* W normal */
+  if (s === 'W') {
+    return '<div class="cw has-tt"><span class="bdg bW">W</span>'
+      + '<div class="ci cg">' + (isP ? (cell.cust||'') : (cell.driverName||'')) + '</div>'
+      + '<div class="ci cit">' + (isP ? (cell.proj||'') : (cell.cust||'')) + '</div>'
+      + '<div class="ci">' + (cell.doc||'') + '</div>'
+      + '<div class="ci ct">' + (cell.timeFrom||'') + (cell.timeTo?'–'+cell.timeTo:'') + '</div>'
+      + ttW(null, cell, isP) + '</div>';
+  }
+
+  /* W2 (vehicle 2 drivers) */
+  if (s === 'W2') {
+    return '<div class="cw2 has-tt"><span class="bdg bW">W</span>'
+      + '<div class="ci cg">' + (cell.driverList||[]).map(function(d){return d.name.split(' ')[0];}).join('+') + '</div>'
+      + '<div class="multi">' + (cell.driverList||[]).length + ' คนขับ</div>'
+      + ttW2(cell.driverList) + '</div>';
+  }
+
+  return '<div class="cx"><span class="bdg bx">—</span></div>';
+}
+
+/* Tooltip builders */
+function ttW(title, c, isP) {
+  var h = '<div class="tt"><div class="tt-tl" style="color:var(--g7)">'
+    + (title || 'W — วิ่งงาน') + '</div>';
+  if (!isP && c.driverName) h += '<div class="ttr"><span class="ttl">คนขับ</span><span class="ttv">' + c.driverName + '</span></div>';
+  if (c.cust)  h += '<div class="ttr"><span class="ttl">ลูกค้า</span><span class="ttv">'     + c.cust  + '</span></div>';
+  if (c.proj)  h += '<div class="ttr"><span class="ttl">โปรเจกต์</span><span class="ttv">' + c.proj  + '</span></div>';
+  if (c.doc)   h += '<div class="ttr"><span class="ttl">Job No.</span><span class="ttv">'   + c.doc   + '</span></div>';
+  if (c.route || c.timeFrom) h += '<hr class="ttsep">';
+  if (c.route)    h += '<div class="ttr"><span class="ttl">เส้นทาง</span><span class="ttv">' + c.route + '</span></div>';
+  if (c.timeFrom) h += '<div class="ttr"><span class="ttl">ออก</span><span class="ttv">'    + c.timeFrom + '</span></div>';
+  if (c.timeTo)   h += '<div class="ttr"><span class="ttl">กลับ</span><span class="ttv">'   + c.timeTo   + '</span></div>';
+  return h + '</div>';
+}
+function ttW2(drivers) {
+  var h = '<div class="tt"><div class="tt-tl" style="color:var(--g7)">วิ่ง ' + (drivers||[]).length + ' รอบในวันนี้</div>';
+  (drivers||[]).forEach(function(d) {
+    h += '<div class="tt-drv-row"><div class="tt-dot"></div>'
+      + '<div><b>' + d.name + '</b> · ' + d.cust + ' · ' + d.doc
+      + '<br><span style="font-size:9px;color:var(--t2)">' + d.timeFrom + '–' + d.timeTo + '</span></div></div>';
+  });
+  return h + '</div>';
+}
+function ttLeave(type, note) {
+  var map = {
+    BL:['var(--b7)','ลากิจ'], SL:['var(--a7)','ลาป่วย'],
+    EL:['var(--pk7)','ลากะทันหัน'], AL:['var(--cr7)','ลาอุบัติเหตุ'],
+    OFF:['var(--gy7)','หยุดงาน']
+  };
+  var m = map[type] || ['var(--t2)',type];
+  return '<div class="tt"><div class="tt-tl" style="color:' + m[0] + '">' + type + ' — ' + m[1] + '</div>'
+    + '<div class="ttr"><span class="ttl">ระยะเวลา</span><span class="ttv">' + (note||'เต็มวัน') + '</span></div>'
+    + '</div>';
+}
+function ttP(note) {
+  return '<div class="tt"><div class="tt-tl" style="color:var(--r7)">P — จอด (auto)</div>'
+    + '<div class="ttr"><span class="ttl">เหตุผล</span><span class="ttv">' + (note||'ไม่มี job วันนี้') + '</span></div>'
+    + '<div style="font-size:9px;color:var(--t3);margin-top:4px">คำนวณอัตโนมัติ ไม่ต้องกรอก</div>'
+    + '</div>';
+}
+
+/* ═══════════════════════════════════════════════════════
+   BUILD HOURLY TABLE
+═══════════════════════════════════════════════════════ */
+function buildHourly(data) {
+  var isP = S.main === 'people';
+  var h = '<table class="h-tbl"><thead><tr>'
+    + '<th class="thd">' + (isP ? 'คนขับ / Vanboy' : 'รถ / Vehicle') + '</th>'
+    + '<th class="thday">วัน</th>';
+  for (var i = 0; i < 24; i++) {
+    h += '<th class="' + (i%6===0 ? 'thk' : '') + '">' + (i<10?'0':'') + i + '</th>';
+  }
+  h += '<th class="hthu">Util%</th></tr></thead><tbody>';
+
+  data.rows.forEach(function(row) {
+    var activeDays = row.days.filter(function(d){ return d.jobs && d.jobs.length > 0; });
+    /* show all 7 days — empty = P auto */
+    data.days.forEach(function(day, ri) {
+      var dayData = row.days.find(function(d){ return d.di === day.di; }) || { di: day.di, jobs: [] };
+      var dj = dayData.jobs || [];
+      var ml = dj.reduce(function(m,j){ return Math.max(m, j.layer||0); }, 0);
+      var layers = ml + 1;
+      var isP_day = dj.length === 0;
+      var wc = dj.filter(function(j){ return j.type==='w'; }).length;
+      var rc = (ri===0 ? 'dfirst ' : '') + (day.isSat ? 'dsat' : day.isSun ? 'dsun' : '');
+
+      for (var li = 0; li < layers; li++) {
+        h += '<tr class="' + rc + '">';
+
+        /* row label (rowspan all days × layers) */
+        if (ri === 0 && li === 0) {
+          var tr2 = data.days.reduce(function(s, d2) {
+            var dd = row.days.find(function(x){ return x.di===d2.di; }) || { jobs:[] };
+            var ml2 = (dd.jobs||[]).reduce(function(m,j){ return Math.max(m,j.layer||0); }, 0);
+            return s + (ml2 + 1);
+          }, 0);
+          h += '<td class="tdd" rowspan="' + tr2 + '">';
+          if (isP) {
+            h += '<div class="rname">' + row.name + '</div>'
+              + '<div class="rmeta">' + row.meta + '</div>'
+              + '<div class="rtags"><span class="tag ' + (row.role==='driver'?'tg-dr':'tg-vb') + '">'
+              + (row.role==='driver'?'คนขับ':'Vanboy') + '</span>'
+              + '<span class="tag tg-pu">' + row.type + '</span></div>';
+          } else {
+            h += '<div class="rname" style="font-family:var(--mono);letter-spacing:.04em">' + row.plate + '</div>'
+              + '<div class="rmeta">' + row.vehicleMeta + '</div>'
+              + '<div class="rtags"><span class="tag tg-pu">' + row.vehicleType + '</span></div>';
+          }
+          h += '</td>';
+        }
+
+        /* day cell */
+        if (li === 0) {
+          h += '<td class="tday" rowspan="' + layers + '">'
+            + '<span class="dlbl ' + (day.isToday?'today':day.isSun?'sun':day.isSat?'sat':'') + '">' + day.label + '</span>';
+          if (isP_day)     h += '<div class="djobs" style="color:var(--r4)">P auto</div>';
+          else if (wc > 0) h += '<div class="djobs">' + wc + ' job' + (wc>1?'s':'') + '</div>';
+          if (layers > 1)  h += '<div class="dlayers">' + layers + ' layers</div>';
+          h += '</td>';
+        }
+
+        /* hour cells */
+        for (var hr = 0; hr < 24; hr++) {
+          h += '<td class="thr">';
+
+          if (isP_day) {
+            /* P auto block */
+            var iS2 = hr===0, iE2 = hr===23;
+            var br2 = iS2 ? '3px 0 0 3px' : iE2 ? '0 3px 3px 0' : '0';
+            var mg2 = iS2 ? '1px 0 1px 1px' : iE2 ? '1px 1px 1px 0' : '1px 0';
+            h += '<div class="jb jp2 has-tt" style="border-radius:' + br2 + ';margin:' + mg2 + ';height:20px">';
+            if (iS2) h += '<span>P</span>';
+            h += ttP() + '</div>';
+          } else {
+            var lj = dj.filter(function(j){ return (j.layer||0)===li && j.startH<(hr+1) && j.endH>hr; });
+            if (lj.length > 0) {
+              var job = lj[0];
+              var iS = job.startH>=hr && job.startH<(hr+1);
+              var iE = job.endH>hr && job.endH<=(hr+1);
+              var br = iS&&iE ? '3px' : iS ? '3px 0 0 3px' : iE ? '0 3px 3px 0' : '0';
+              var mg = iS ? '1px 0 1px 1px' : iE ? '1px 1px 1px 0' : '1px 0';
+              var jcls = {w:'jw',p:'jp2',bl:'jbl',sl:'jsl',el:'jel',al:'jal',of:'jof'}[job.type]||'jw';
+              h += '<div class="jb ' + jcls + ' has-tt" style="border-radius:' + br + ';margin:' + mg + ';height:20px">';
+              if (iS) h += '<span>' + (job.label||'') + '</span>';
+              /* hourly tooltip */
+              h += '<div class="tt"><div class="tt-tl" style="color:var(--g7)">' + (job.label||job.type) + '</div>';
+              if (job.driverName) h += '<div class="ttr"><span class="ttl">คนขับ</span><span class="ttv">' + job.driverName + '</span></div>';
+              if (job.cust && job.cust!=='-') h += '<div class="ttr"><span class="ttl">ลูกค้า</span><span class="ttv">' + job.cust + '</span></div>';
+              if (job.doc  && job.doc!=='-')  h += '<div class="ttr"><span class="ttl">Job No.</span><span class="ttv">'  + job.doc  + '</span></div>';
+              if (job.route && job.route!=='-') h += '<hr class="ttsep"><div class="ttr"><span class="ttl">เส้นทาง</span><span class="ttv">' + job.route + '</span></div>';
+              h += '<div class="ttr"><span class="ttl">ช่วงเวลา</span><span class="ttv">' + hh(job.startH) + '–' + hh(Math.min(job.endH,24)) + '</span></div>';
+              h += '</div></div>';
+            }
+          }
+          h += '</td>';
+        }
+
+        /* util col */
+        if (ri === 0 && li === 0) {
+          h += '<td class="htdu" rowspan="' + tr2 + '"><div class="ru">'
+            + '<div class="rur"><span class="rul">Day</span>'
+            + '<span class="rud">' + (row.dayUtil||0) + '%</span>'
+            + '<div class="rub"><div class="ruf" style="width:' + Math.min(row.dayUtil||0,100) + '%"></div></div></div>'
+            + '<div class="rur"><span class="rul">Time</span>'
+            + '<span class="rut">' + (row.timeUtil||0) + '%</span>'
+            + '<div class="rub"><div class="ruf" style="width:' + Math.min(row.timeUtil||0,100) + '%"></div></div></div>'
+            + '</div></td>';
+        }
+        h += '</tr>';
+      }
+    });
+  });
+
+  /* tfoot */
+  h += '</tbody><tfoot><tr><td class="tfd">Fleet active/ชม.</td><td class="tfday">7 วัน</td>';
+  for (var hr2 = 0; hr2 < 24; hr2++) {
+    var pct = data.hourlyFleetUtil ? (data.hourlyFleetUtil[hr2]||0) : 0;
+    h += '<td style="color:' + (pct>0?'#3B2FA0':'#C9C7BE') + '">' + pct + '%</td>';
+  }
+  h += '<td class="tfu">avg</td></tr></tfoot></table>';
+  return h;
+}
+
+/* ═══════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════ */
+function hh(v) {
+  var h2 = Math.floor(v), m = Math.round((v-h2)*60);
+  return (h2<10?'0':'') + h2 + ':' + (m<10?'0':'') + m;
+}
+
+/* ═══════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════ */
+function switchMain(v) {
+  S.main = v;
+  document.getElementById('nm-p').classList.toggle('active', v==='people');
+  document.getElementById('nm-v').classList.toggle('active', v==='vehicle');
+  updateSidebar();
+  updatePbar();
+  loadView();
+}
+
+function switchSub(v) {
+  S.sub = v;
+  document.getElementById('tg-daily').classList.toggle('active',  v==='daily');
+  document.getElementById('tg-hourly').classList.toggle('active', v==='hourly');
+  document.getElementById('period-tg').classList.toggle('hide',   v==='hourly');
+  document.getElementById('hourly-lbl').classList.toggle('show',  v==='hourly');
+  updatePbar();
+  loadView();
+}
+
+function switchN(n, el) {
+  S.n = n;
+  document.querySelectorAll('#period-tg .tgb').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  loadView();
+}
+
+function shiftPeriod(dir) {
+  var d = new Date(S.dateFrom);
+  d.setDate(d.getDate() + dir * S.n);
+  S.dateFrom = d.toISOString().slice(0,10);
+  var d2 = new Date(d);
+  d2.setDate(d2.getDate() + S.n - 1);
+  S.dateTo = d2.toISOString().slice(0,10);
+  S.cache = {};
+  updatePbar();
+  loadView();
+}
+
+function goToday() {
+  var today = new Date();
+  var day = today.getDate();
+  S.dateFrom = today.toISOString().slice(0,8) + (day <= 15 ? '01' : '16');
+  var d2 = new Date(today.getFullYear(), today.getMonth()+1, 0);
+  S.dateTo = day <= 15
+    ? today.toISOString().slice(0,8) + '15'
+    : d2.toISOString().slice(0,10);
+  S.cache = {};
+  updatePbar();
+  loadView();
+}
+
+function onPeriodChange() {
+  var val = document.getElementById('sb-period').value.split('|');
+  S.dateFrom = val[0]; S.dateTo = val[1];
+  S.cache = {};
+  updatePbar();
+  loadView();
+}
+
+function updatePbar() {
+  var thaiMonths = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var df = new Date(S.dateFrom), dt = new Date(S.dateTo);
+  var thaiYearF = df.getFullYear() + 543;
+  var title = S.sub==='hourly'
+    ? df.getDate() + '–' + dt.getDate() + ' ' + thaiMonths[df.getMonth()+1] + ' ' + thaiYearF + ' (7 วัน)'
+    : df.getDate() + '–' + dt.getDate() + ' ' + thaiMonths[df.getMonth()+1] + ' ' + thaiYearF;
+  document.getElementById('pbar-title').textContent = title;
+  document.getElementById('pbar-sub').textContent =
+    (S.main==='people'?'People view':'Vehicle view') + ' · Own Fleet · ' +
+    (S.sub==='daily' ? 'Daily ' + S.n + ' วัน' : 'Hourly · 7 วัน');
+  document.getElementById('hourly-lbl').textContent =
+    df.getDate() + '–' + dt.getDate() + ' ' + thaiMonths[df.getMonth()+1];
+}
+
+/* ═══════════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════════ */
+function updateSidebar() {
+  var fp = document.getElementById('sb-filters');
+  var lp = document.getElementById('sb-legend');
+
+  if (S.main === 'people') {
+    fp.innerHTML = '<div class="sb-lbl">Filter</div>'
+      + '<select class="fsel" onchange="applyFilter(\'status\',this.value)">'
+      + '<option value="all">สถานะ: ทั้งหมด</option>'
+      + '<option value="active" selected>มี job งวดนี้</option>'
+      + '<option value="no">ไม่มี job</option>'
+      + '</select>'
+      + '<select class="fsel" onchange="applyFilter(\'role\',this.value)">'
+      + '<option value="all">Role: ทั้งหมด</option>'
+      + '<option value="driver">คนขับ</option>'
+      + '<option value="vanboy">Vanboy</option>'
+      + '</select>'
+      + '<select class="fsel" onchange="applyFilter(\'type\',this.value)">'
+      + '<option value="all">Truck type: ทั้งหมด</option>'
+      + '<option value="PU">PU</option>'
+      + '<option value="FT">FT</option>'
+      + '<option value="10W">10W</option>'
+      + '</select>'
+      + '<select class="fsel" onchange="applyFilter(\'fleet\',this.value)">'
+      + '<option value="all">Fleet: ทั้งหมด</option>'
+      + '<option value="WC">WC Fleet</option>'
+      + '</select>'
+      + '<button class="sb-reset" onclick="resetFilter()">รีเซ็ต Filter</button>'
+      + '<div class="sb-cnt" id="sb-cnt"></div>';
+
+    lp.innerHTML = '<div class="sb-lbl">Legend</div>'
+      + '<div class="leg"><div class="lb" style="background:var(--g50);border:1px solid var(--g4)"></div>W = วิ่งงาน</div>'
+      + '<div class="leg"><div class="lb" style="background:repeating-linear-gradient(45deg,#F09595,#F09595 2px,#FCDEDE 2px,#FCDEDE 4px)"></div>P = จอด (auto)</div>'
+      + '<div class="leg"><div class="lb" style="background:var(--b50);border:1px solid var(--b4)"></div>BL = ลากิจ</div>'
+      + '<div class="leg"><div class="lb" style="background:var(--a50);border:1px solid var(--a4)"></div>SL = ลาป่วย</div>'
+      + '<div class="leg"><div class="lb" style="background:var(--pk50);border:1px solid var(--pk4)"></div>EL = ลากะทันหัน</div>'
+      + '<div class="leg"><div class="lb" style="background:var(--cr50);border:1px solid var(--cr4)"></div>AL = ลาอุบัติเหตุ</div>'
+      + '<div class="leg"><div class="lb" style="background:var(--gy50);border:1px solid var(--gy4)"></div>OFF = หยุดงาน</div>'
+      + '<div class="sb-note">P = ไม่มี job และไม่มี leave → คำนวณอัตโนมัติ</div>';
+  } else {
+    fp.innerHTML = '<div class="sb-lbl">Filter</div>'
+      + '<select class="fsel" onchange="applyFilter(\'type\',this.value)">'
+      + '<option value="all">Type: ทั้งหมด</option>'
+      + '<option value="PU">PU</option>'
+      + '<option value="FT">FT</option>'
+      + '<option value="10W">10W</option>'
+      + '</select>'
+      + '<select class="fsel" onchange="applyFilter(\'fleet\',this.value)">'
+      + '<option value="all">Fleet: ทั้งหมด</option>'
+      + '<option value="WC">WC Fleet</option>'
+      + '</select>'
+      + '<select class="fsel" onchange="applyFilter(\'status\',this.value)">'
+      + '<option value="active" selected>มี job งวดนี้</option>'
+      + '<option value="all">ทั้งหมด</option>'
+      + '<option value="idle">P ตลอดงวด</option>'
+      + '</select>'
+      + '<button class="sb-reset" onclick="resetFilter()">รีเซ็ต Filter</button>'
+      + '<div class="sb-cnt" id="sb-cnt"></div>';
+
+    lp.innerHTML = '<div class="sb-lbl">Legend</div>'
+      + '<div class="leg"><div class="lb" style="background:var(--g50);border:1px solid var(--g4)"></div>W = รถออกวิ่ง</div>'
+      + '<div class="leg"><div class="lb" style="background:repeating-linear-gradient(45deg,#F09595,#F09595 2px,#FCDEDE 2px,#FCDEDE 4px)"></div>P = รถจอด (auto)</div>'
+      + '<div class="leg"><div class="lb" style="background:var(--g50);border-left:3px solid var(--g4)"></div>W หลายคนขับ</div>'
+      + '<div class="sb-note">P = ไม่มี job วันนั้น → auto</div>';
+  }
+}
+
+/* Client-side row filter (hide/show rows already in DOM) */
+var F = { status:'active', role:'all', type:'all', fleet:'all' };
+function applyFilter(key, val) {
+  F[key] = val;
+  var rows = document.querySelectorAll('#v-' + S.main + '-' + S.sub + ' tbody tr');
+  var n = 0;
+  rows.forEach(function(tr) {
+    var ok = true;
+    if (F.status !== 'all') {
+      var hasJob = tr.querySelector('.tg-has');
+      var noJob  = tr.querySelector('.tg-no,.tg-idle');
+      if (F.status==='active'  && !hasJob) ok=false;
+      if (F.status==='no'      && !noJob)  ok=false;
+      if (F.status==='idle'    && !noJob)  ok=false;
+    }
+    if (F.role !== 'all') {
+      var roleEl = tr.querySelector('.tg-dr,.tg-vb');
+      if (roleEl) {
+        if (F.role==='driver' && !roleEl.classList.contains('tg-dr')) ok=false;
+        if (F.role==='vanboy' && !roleEl.classList.contains('tg-vb')) ok=false;
+      }
+    }
+    if (F.type !== 'all') {
+      var typeEl = tr.querySelector('.tg-pu,.tg-ft');
+      if (typeEl && !typeEl.textContent.includes(F.type)) ok=false;
+    }
+    tr.style.display = ok ? '' : 'none';
+    if (ok) n++;
+  });
+  var cnt = document.getElementById('sb-cnt');
+  if (cnt) cnt.textContent = n + ' รายการ';
+}
+function resetFilter() {
+  F = { status:'all', role:'all', type:'all', fleet:'all' };
+  document.querySelectorAll('#sb-filters select').forEach(function(s){ s.value='all'; });
+  applyFilter('_','_');
+}
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+updateSidebar();
+updatePbar();
+
+/* ── ถ้า GAS_URL ยังไม่ได้ตั้ง → แสดง placeholder message ── */
+if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+  document.querySelectorAll('.vs').forEach(function(v){ v.classList.remove('active'); });
+  document.getElementById('v-people-daily').classList.add('active');
+  document.getElementById('v-people-daily').innerHTML =
+    '<div class="state-box">'
+    + '<svg width="48" height="48" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#DDDBD3" stroke-width="1.5"/><path d="M8 12h8M8 8h8M8 16h5" stroke="#DDDBD3" stroke-width="1.4" stroke-linecap="round"/></svg>'
+    + '<p style="font-weight:600;color:var(--t1)">ยังไม่ได้ตั้งค่า GAS URL</p>'
+    + '<small>แก้ไข <code style="background:var(--s2);padding:1px 6px;border-radius:3px">GAS_URL</code> ในไฟล์นี้บรรทัดแรกของ &lt;script&gt;</small>'
+    + '<small style="margin-top:4px">หลัง Deploy Google Apps Script แล้ว copy URL มาวางแทนที่ครับ</small>'
+    + '</div>';
+} else {
+  loadView();
+}
+</script>
+</body>
+</html>
